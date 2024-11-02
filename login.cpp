@@ -13,7 +13,7 @@
 #include "login.h"
 using namespace std;
 
-
+// User class functions
 string User::hashPassword(const string& password) {
     string hashedPassword;
     for (char c : password) {
@@ -79,7 +79,7 @@ void User::setPassword(const string& newPassword) {
     hashedPassword = hashPassword(newPassword);
 }
 
-
+//login class functions
 void login::Login() {
     string username, password;
     system("clear");
