@@ -13,10 +13,11 @@
 #include "login.h"
 using namespace std;
 
+
 string User::hashPassword(const string& password) {
     string hashedPassword;
     for (char c : password) {
-        hashedPassword += to_string(static_cast<int>(c) + 1); 
+        hashedPassword += to_string(static_cast<int>(c) + 1);
     }
     return hashedPassword;
 }
@@ -25,14 +26,14 @@ string User::generateVerificationCode() {
     srand(static_cast<unsigned int>(time(0)));
     string code;
     for (int i = 0; i < 6; ++i) {
-        code += to_string(rand() % 10); 
+        code += to_string(rand() % 10);
     }
     return code;
 }
 
 User::User(const string& uname, const string& password, const string& secQuestion, const string& mail)
     : username(uname), hashedPassword(hashPassword(password)), securityQuestion(secQuestion), email(mail), isVerified(0) {
-    verificationCode = generateVerificationCode(); 
+    verificationCode = generateVerificationCode();
 }
 
 Status User::verifyPassword(const string& password) {
@@ -74,72 +75,55 @@ Status User::verifyEmail(const string& code) {
     return FAILURE;
 }
 
+void User::setPassword(const string& newPassword) {
+    hashedPassword = hashPassword(newPassword);
+}
 
 
 void login::Login() {
     string username, password;
-    cout << "\nPlease enter your username: ";
+    system("clear");
+    cout << "\n\t\t\t Please enter the username and password: " << endl;
+    cout << "\t\t\t USERNAME: ";
     cin >> username;
-    cout << "Please enter your password: ";
+    cout << "\t\t\t PASSWORD: ";
     cin >> password;
 
-   
-    for (const auto& user : users) {
+    for (auto& user : users) {
         if (user.getUsername() == username) {
             Status status = user.verifyPassword(password);
             if (status == SUCCESS) {
-                cout << "Login successful!\n";
+                cout << "\nLogin successful!\n";
                 return;
             } else if (status == NOT_VERIFIED) {
-                cout << "Email not verified. Please verify your email first.\n";
-                return;
-            } else {
-                cout << "Invalid password.\n";
+                cout << "\nEmail not verified. Please verify your email first.\n";
                 return;
             }
         }
     }
-    cout << "User not found.\n";
+    cout << "\nInvalid username or password.\n";
 }
 
 void login::Registration() {
     string regUser, regPassword, regEmail, securityQuestion;
-    cout << "\nEnter Username: ";
+    system("clear");
+    cout << "\n\t\t\t Enter Username: ";
     cin >> regUser;
-    cout << "Enter Password: ";
+    cout << "\t\t\t Enter Password: ";
     cin >> regPassword;
-    cout << "Security Question (What was your favorite childhood movie?): ";
+    cout << "\t\t\t Security Question: What was your favorite childhood movie?: ";
     cin.ignore();
     getline(cin, securityQuestion);
-    cout << "Enter Email: ";
+    cout << "\t\t\t Enter Email: ";
     cin >> regEmail;
 
-   
-    string hashedPassword = User::hashPassword(regPassword);
-
-  
-    ifstream input("data.txt");
-    string regId, regPass, regSec, regMail;
-
-    while (input >> regId >> regPass >> regSec >> regMail) {
-        if (regUser == regId) {
-            cout << "Username already taken. Please try a different one.\n";
-            return;
-        }
-    }
-
-    
-    ofstream output("data.txt", ios::app);
-    output << regUser << ' ' << hashedPassword << ' ' << securityQuestion << ' ' << regEmail << endl;
-
-    cout << "Registration successful! Please check your email for a verification code.\n";
-
-    
     User newUser(regUser, regPassword, securityQuestion, regEmail);
-    newUser.sendVerificationEmail();
-
-    
+    newUser.sendVerificationEmail(); 
     users.push_back(newUser);
+    ofstream f1("data.txt", ios::app);
+    f1 << regUser << ' ' << newUser.getEmail() << ' ' << newUser.getSecurityQuestion() << endl;
+    system("clear");
+    cout << "\n\t\t\t Registration successful!\n";
 }
 
 void login::VerifyEmail() {
@@ -164,35 +148,37 @@ void login::VerifyEmail() {
     cout << "User not found.\n";
 }
 
-void login::DrunkGame() {
-    srand(static_cast<unsigned int>(time(0)));
-    const int size = 60;
-    cout << "Enter a letter to begin: ";
-    char x;
-    cin >> x;
-    int position = size / 2;
-    while (true) {
-        cout << "|START|";
-        for (int i = 0; i < size; i++) {
-            if (i == position)
-                cout << x;
-            else
-                cout << " ";
+void login::ForgotPassword() {
+    string username, answer, newPassword;
+    system("clear");
+    
+    cout << "\n\t\t\tForgot Password\n";
+    cout << "\t\t\tEnter your username: ";
+    cin >> username;
+
+    for (auto& user : users) {
+        if (user.getUsername() == username) {
+            cout << "\t\t\tSecurity Question: " << user.getSecurityQuestion() << endl;
+            cout << "\t\t\tYour answer: ";
+            cin.ignore(); 
+            getline(cin, answer);
+
+            
+            if (answer == "correct_answer") { 
+                cout << "\t\t\tEnter your new password: ";
+                cin >> newPassword;
+                user.setPassword(newPassword);
+                cout << "\n\t\t\tPassword has been updated successfully!\n";
+                return;
+            } else {
+                cout << "\t\t\tIncorrect answer to the security question.\n";
+                return;
+            }
         }
-        cout << "|END|" << endl;
-        int move = rand() % 3 - 1;
-        position += move;
-        if (position < 1) {
-            cout << "Guess you were too drunk to make it to the end...\n";
-            break;
-        }
-        if (position > size - 1) {
-            cout << "You might be drunk, but you made it to the end!\n";
-            break;
-        }
-        for (int sleep = 0; sleep < 1000000; ++sleep);
     }
+    cout << "\t\t\tUser not found.\n";
 }
+
 
 void login::DeleteLine(string userDelete) {
     string line;
