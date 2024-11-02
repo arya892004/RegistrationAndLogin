@@ -20,8 +20,9 @@ int main()
     cout << "\t\t\t_________           Menu           __________\n\n";
     cout << "\t | Press 1 to LOGIN                              |" << endl;
     cout << "\t | Press 2 to REGISTER                           |" << endl;
-    cout << "\t | Press 3 if you forgot PASSWORD                |" << endl;
-    cout << "\t | Press 4 to EXIT                               |" << endl;
+    cout << "\t | Press 3 verify your email                     |" << endl;
+    cout << "\t | Press 4 if you forgot PASSWORD                |" << endl;
+    cout << "\t | Press 5 to EXIT                               |" << endl;
     cout << "\n\t\t\t Please Enter your choice: ";
     cin >> userChoice;
     cout << endl;
@@ -35,13 +36,18 @@ int main()
     {
         userLogin.Registration();
         main();
-    }
+    } 
     else if (userChoice == "3")
+    {
+       userlogin.VerifyEmail(); 
+        main();
+    }
+    else if (userChoice == "4")
     {
         userLogin.ForgotPassword();
         main();
     }
-    else if (userChoice == "4")
+    else if (userChoice == "5")
     {
         cout << "\t\t\t Goodbye! \n\n";
     }
