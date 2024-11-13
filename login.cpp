@@ -148,15 +148,87 @@ void login::DrunkGame()
 
 void login::ForgotPassword()
 {
-/*     string forgotChoice, count, secondCount;
-    system("clear");
-    cout << "\n\t\t\tPress 1 to enter USERNAME\n";
-    cout << "\t\t\tPress 2 to go back to MENU\n";
-    cout << "\n\t\t\tEnter choice: ";
-    cin >> forgotChoice; */
 
-    //*******************Enter your code here*************************
+    string username, regId, regPass, regSecure, inputAnswer, storedAnswer;
+    
+    system("clear");
+    cout << "\n\t\t\t Forgot Password\n";
+    cout << "\t\t\t Enter your username: ";
+    cin >> username;
+
+    
+    ifstream input("data.txt");
+
+   
+    while (input >> regId >> regPass >> regSecure)
+    {
+        if (username == regId)
+        {
+            
+            cout << "\t\t\t Security Question: What was your favorite childhood movie? ";
+            cin.ignore();  
+            getline(cin, inputAnswer);
+
+           
+            stringstream ss;
+            ss << regSecure;
+            string storedAnswerHash;
+            ss >> storedAnswer;
+
+            
+            if (inputAnswer == storedAnswer)
+            {
+                cout << "\n\t\t\t Security Answer correct!\n";
+                string newPassword;
+                cout << "\t\t\t Enter your new password: ";
+                cin >> newPassword;
+
+                
+                string newHash = newPassword;
+                hash<string> mystdhash;
+                int newPasswordHash = mystdhash(newHash);
+
+               
+                ifstream file("data.txt");
+                ofstream temp("temp.txt");
+
+               
+                while (file >> regId >> regPass >> regSecure)
+                {
+                    if (username == regId)
+                    {
+                       
+                        temp << regId << " " << newPasswordHash << " " << regSecure << endl;
+                    }
+                    else
+                    {
+                       
+                        temp << regId << " " << regPass << " " << regSecure << endl;
+                    }
+                }
+
+                file.close();
+                temp.close();
+
+               
+                remove("data.txt");
+                rename("temp.txt", "data.txt");
+
+                cout << "\n\t\t\t Password reset successfully!\n";
+                return; 
+            else
+            {
+                cout << "\t\t\t Incorrect security answer.\n";
+                return;  
+            }
+        }
+    }
+
+   
+    cout << "\t\t\t Username not found. Please try again.\n";
 }
+
+
 
 void login::DeleteLine(string userDelete)
 {
